@@ -21,25 +21,38 @@ class ParallelEvaluator(object):
     def evaluate(self, envs, pops):
         eval_jobs = []
         for i in range(len(envs)):
-            raw_score_dict = [[{} for _ in pops[i][0].population.values()] for _ in pops[i]]
-            configs = [p.config for p in pops[i]]
+            genome_to_ref = [{} for _ in pops[i]]
+            ref_to_genome = [{} for _ in pops[i]]
+            eval_score_dict = []
+            configs = []
+            for j, p in enumerate(pops[i]):
+                genomes = p.population.values()
+                eval_score_dict.append([{} for _ in genomes])
+                configs.append(p.config)
+                for ref, g in enumerate(genomes):
+                    genome_to_ref[j][g] = str(ref)
+                    ref_to_genome[j][str(ref)] = g
             genome_pairs = self.pairing_function(pops[i])
             for genome_pair in genome_pairs:
-                eval_jobs.append(self.pool.apply_async(self.eval_function, (envs[i], genome_pair, configs)))
+                eval_jobs.append(self.pool.apply_async(self.eval_function,
+                                                       (envs[i], genome_pair, configs)))
             indices = {}
-            last_indices = [0, 0]
+            last_index = [0, 0]
             for job, genome_pair in zip(eval_jobs, genome_pairs):
-                raw_scores = job.get(timeout=self.timeout)
-                for j, score in enumerate(raw_scores):
-                    other = (j + 1) % len(genome_pair)
-                    if genome_pair[other] not in indices.keys():
-                        indices[genome_pair[other]] = last_indices[other]
-                        last_indices[other] += 1
-                    index = indices[genome_pair[other]]
-                    raw_score_dict[j][index][genome_pair[j]] = score
-            for k, p in enumerate(pops[i]):
-                genomes = p.population.values()
-                rank, intralayer_rank, layers = self.ranking_function(genomes, raw_score_dict[k])
-                counts = [len(l) for l in layers]
-                for g in genomes:
-                    g.fitness = intralayer_rank[g] / (counts[rank[g]] + 1) - rank[g]
+                eval_scores = job.get(timeout=self.timeout)
+                for j, score in enumerate(eval_scores):
+                    other_index = (j + 1) % len(genome_pair)
+                    if genome_pair[other_index] not in indices.keys():
+                        indices[genome_pair[other_index]] = last_index[other_index]
+                        last_index[other_index] += 1
+                    index = indices[genome_pair[other_index]]
+                    eval_score_dict[j][index][genome_to_ref[j][genome_pair[j]]] = score
+            rank_jobs = []
+            for j in range(len(pops[i])):
+                rank_jobs.append(self.pool.apply_async(self.ranking_function,
+                                                       (ref_to_genome[j].keys(),
+                                                        eval_score_dict[j])))
+            for j, job in enumerate(rank_jobs):
+                ranks = job.get(timeout=self.timeout)
+                for ref in ranks.keys():
+                    ref_to_genome[j][ref].fitness = ranks[ref]

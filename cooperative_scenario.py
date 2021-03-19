@@ -24,7 +24,7 @@ class CooperativeScenario(BaseScenario):
             agent.collide = True
             agent.size = 0.05
             agent.accel = 3.0
-            agent.max_speed = 0.25
+            agent.max_speed = 1
         # add landmarks
         world.landmarks = [Landmark() for _ in range(self.num_landmarks)]
         for i, landmark in enumerate(world.landmarks):

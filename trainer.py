@@ -56,26 +56,33 @@ def pair_random_one_vs_one(pops):
 
 def fitness_function(envs, pops):
     for i in range(len(envs)):
-        raw_score_dict = [[{} for _ in pops[i][0].population.values()] for _ in pops[i]]
-        configs = [p.config for p in pops[i]]
+        genome_to_ref = [{} for _ in pops[i]]
+        ref_to_genome = [{} for _ in pops[i]]
+        eval_score_dict = []
+        configs = []
+        for j, p in enumerate(pops[i]):
+            genomes = p.population.values()
+            eval_score_dict.append([{} for _ in genomes])
+            configs.append(p.config)
+            for ref, g in enumerate(genomes):
+                genome_to_ref[j][g] = str(ref)
+                ref_to_genome[j][str(ref)] = g
         genome_pairs = pair_all_vs_all(pops[i])
         indices = {}
         last_indices = [0, 0]
         for genome_pair in genome_pairs:
             raw_scores = eval_genome_pair(envs[i], genome_pair, configs)
             for j, score in enumerate(raw_scores):
-                other = (j + 1) % len(genome_pair)
-                if genome_pair[other] not in indices.keys():
-                    indices[genome_pair[other]] = last_indices[other]
-                    last_indices[other] += 1
-                index = indices[genome_pair[other]]
-                raw_score_dict[j][index][genome_pair[j]] = score
-        for p in pops[i]:
-            genomes = p.population.values()
-            rank, intralayer_rank, layers = pareto_ranking(genomes, raw_score_dict)
-            counts = [len(l) for l in layers]
-            for g in genomes:
-                g.fitness = intralayer_rank[g] / (counts[rank[g]] + 1) - rank[g]
+                other_index = (j + 1) % len(genome_pair)
+                if genome_pair[other_index] not in indices.keys():
+                    indices[genome_pair[other_index]] = last_indices[other_index]
+                    last_indices[other_index] += 1
+                index = indices[genome_pair[other_index]]
+                eval_score_dict[j][index][genome_to_ref[j][genome_pair[j]]] = score
+        for j, p in enumerate(pops[i]):
+            ranks = pareto_ranking(ref_to_genome[j].keys(), eval_score_dict)
+            for ref in ranks.keys():
+                ref_to_genome[j][ref].fitness = ranks[ref]
 
 
 def eval_genome_pair(env, genome_pair, configs):
@@ -88,7 +95,7 @@ def eval_genome_pair(env, genome_pair, configs):
         num_runs = 5
     else:
         num_runs = 1
-    steps_per_run = 300
+    steps_per_run = 100
     for _ in range(num_runs):
         obs_n = env.reset()
         for _ in range(steps_per_run):
@@ -104,9 +111,14 @@ def eval_genome_pair(env, genome_pair, configs):
     return total_reward_n
 
 
-def pareto_ranking(genomes, raw_score_dict):
-    ranker = ParetoRanker(genomes, raw_score_dict)
-    return ranker.get_rank()
+def pareto_ranking(genomes, eval_score_dict):
+    ranker = ParetoRanker(genomes, eval_score_dict)
+    interlayer_ranks = ranker.rank_population()
+    intralayer_ranks = ranker.rank_population_intralayer()
+    overall_ranks = {}
+    for g in genomes:
+        overall_ranks[g] = -interlayer_ranks[g] + intralayer_ranks[g]
+    return overall_ranks
 
 
 def run(ecosystem_type, num_gen, parallel=True, save_freq=None):
@@ -226,7 +238,7 @@ def play_winners(path):
             genome = env_assign_map[p]
             nets[i].append(neat.nn.FeedForwardNetwork.create(genome, config))
     # execution loop
-    steps_per_run = 300
+    steps_per_run = 100
     while True:
         for i, env in enumerate(ecosystem.envs):
             env.render()
@@ -281,14 +293,16 @@ def test_action():
 
 def test_pareto():
     population = ['a', 'b', 'c', 'd', 'e']
-    objectives = [{'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5}, {'b': 1, 'a': 2, 'e': 3, 'c': 4, 'd': 5}]
+    objectives = [{'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5}, {'b': 1, 'a': 2, 'd': 3, 'c': 4, 'e': 5}]
     pareto = ParetoRanker(population, objectives)
-    rank = pareto.get_rank()
-    print(pareto.ranked_solutions)
+    rank = pareto.rank_population()
+    intralayer_rank = pareto.rank_population_intralayer()
+    print(intralayer_rank)
 
 
 if __name__ == '__main__':
-    # run('2_competitive', 1000, save_freq=50)
-    play_winners('results/2_competitive/20210318_213301_50')
+    run('2_competitive', 1000, save_freq=50)
+    # play_winners('results/3_mixed/20210313_072514_150')
     # plot_num_net_connections(['results/2_cooperative/%s' % p for p in paths], 2, 50, 'Cooperative Game\n'
     #                                                                                  'Path: 20210307_103127_1000')
+    # test_pareto()

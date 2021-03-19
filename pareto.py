@@ -26,9 +26,8 @@ class ParetoRanker():
         self.sorted_by_objective = []
         for j in range(len(objectives)):
             self.sorted_by_objective.append(sorted(population, key=objectives[j].get, reverse=True))
-        self.layers = None
 
-    def get_rank(self):
+    def rank_population(self):
         for i in range(len(self.population)):
             for j in range(len(self.objectives)):
                 s = self.sorted_by_objective[j][i]
@@ -41,8 +40,7 @@ class ParetoRanker():
                     self.solution_count += 1
             if self.solution_count == len(self.population):
                 break
-        self.layers = [set().union(*r) for r in self.ranked_solutions[0:self.rank_count + 1]]
-        return self.rank, self.intralayer_rank, self.layers
+        return self.rank
 
     def find_rank(self, s, j):
         done = False
@@ -51,11 +49,9 @@ class ParetoRanker():
             for t in self.ranked_solutions[k][j]:
                 check = self.domination_check(s, t)
                 if check:
-                    self.intralayer_rank[t] += 1
                     break
             if not check:
                 self.rank[s] = k
-                self.intralayer_rank[s] += 1
                 done = True
                 self.ranked_solutions[self.rank[s]][j] |= {s}
                 break
@@ -70,3 +66,22 @@ class ParetoRanker():
                 return False
         return True
 
+    def rank_population_intralayer(self):
+        layers = [set().union(*r) for r in self.ranked_solutions[0:self.rank_count + 1]]
+        print(layers)
+        for layer in layers:
+            layer = list(layer)
+            for i, s in enumerate(layer[:-1]):
+                for t in layer[i+1:]:
+                    self.count_domination(s, t)
+        layer_sizes = [len(l) for l in layers]
+        for s in self.population:
+            self.intralayer_rank[s] /= ((layer_sizes[self.rank[s]] - 1) * len(self.objectives) + 1)
+        return self.intralayer_rank
+
+    def count_domination(self, s, t):
+        for j in range(len(self.objectives)):
+            if self.sorted_by_objective[j].index(s) < self.sorted_by_objective[j].index(t):
+                self.intralayer_rank[s] += 1
+            else:
+                self.intralayer_rank[t] += 1

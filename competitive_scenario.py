@@ -26,7 +26,7 @@ class CompetitiveScenario(BaseScenario):
             agent.pursuer = True if i < self.num_pursuers else False
             agent.size = 0.05
             agent.accel = 3.0
-            agent.max_speed = 0.25
+            agent.max_speed = 1
         # add landmarks
         world.landmarks = [Landmark() for i in range(self.num_landmarks)]
         for i, landmark in enumerate(world.landmarks):

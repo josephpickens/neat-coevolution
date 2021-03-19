@@ -62,7 +62,7 @@ def fitness_function(envs, pops):
         configs = []
         for j, p in enumerate(pops[i]):
             genomes = p.population.values()
-            eval_score_dict.append([{} for _ in genomes])
+            eval_score_dict.insert(0, [{} for _ in genomes])
             configs.append(p.config)
             for ref, g in enumerate(genomes):
                 genome_to_ref[j][g] = str(ref)

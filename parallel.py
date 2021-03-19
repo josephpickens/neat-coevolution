@@ -27,7 +27,7 @@ class ParallelEvaluator(object):
             configs = []
             for j, p in enumerate(pops[i]):
                 genomes = p.population.values()
-                eval_score_dict.append([{} for _ in genomes])
+                eval_score_dict.insert(0, [{} for _ in genomes])
                 configs.append(p.config)
                 for ref, g in enumerate(genomes):
                     genome_to_ref[j][g] = str(ref)
@@ -36,16 +36,16 @@ class ParallelEvaluator(object):
             for genome_pair in genome_pairs:
                 eval_jobs.append(self.pool.apply_async(self.eval_function,
                                                        (envs[i], genome_pair, configs)))
-            indices = {}
+            genome_index = {}
             last_index = [0, 0]
             for job, genome_pair in zip(eval_jobs, genome_pairs):
                 eval_scores = job.get(timeout=self.timeout)
                 for j, score in enumerate(eval_scores):
-                    other_index = (j + 1) % len(genome_pair)
-                    if genome_pair[other_index] not in indices.keys():
-                        indices[genome_pair[other_index]] = last_index[other_index]
-                        last_index[other_index] += 1
-                    index = indices[genome_pair[other_index]]
+                    k = (j + 1) % len(eval_scores)
+                    if genome_pair[k] not in genome_index.keys():
+                        genome_index[genome_pair[k]] = last_index[k]
+                        last_index[k] += 1
+                    index = genome_index[genome_pair[k]]
                     eval_score_dict[j][index][genome_to_ref[j][genome_pair[j]]] = score
             rank_jobs = []
             for j in range(len(pops[i])):

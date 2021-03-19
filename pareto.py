@@ -68,7 +68,6 @@ class ParetoRanker():
 
     def rank_population_intralayer(self):
         layers = [set().union(*r) for r in self.ranked_solutions[0:self.rank_count + 1]]
-        print(layers)
         for layer in layers:
             layer = list(layer)
             for i, s in enumerate(layer[:-1]):

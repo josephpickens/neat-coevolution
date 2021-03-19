@@ -1,0 +1,16 @@
+digraph {
+	node [fontsize=9 height=0.2 shape=circle width=0.2]
+	x_self [fillcolor=lightgray shape=box style=filled]
+	y_self [fillcolor=lightgray shape=box style=filled]
+	x_landmark_1 [fillcolor=lightgray shape=box style=filled]
+	y_landmark_1 [fillcolor=lightgray shape=box style=filled]
+	x_landmark_2 [fillcolor=lightgray shape=box style=filled]
+	y_landmark_2 [fillcolor=lightgray shape=box style=filled]
+	x_other [fillcolor=lightgray shape=box style=filled]
+	y_other [fillcolor=lightgray shape=box style=filled]
+	stay [fillcolor=lightblue style=filled]
+	right [fillcolor=lightblue style=filled]
+	left [fillcolor=lightblue style=filled]
+	forward [fillcolor=lightblue style=filled]
+	backward [fillcolor=lightblue style=filled]
+}

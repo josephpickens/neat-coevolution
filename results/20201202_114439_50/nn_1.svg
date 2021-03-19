@@ -1,0 +1,14 @@
+digraph {
+	node [fontsize=9 height=0.2 shape=circle width=0.2]
+	entity_right [fillcolor=lightgray shape=box style=filled]
+	entity_front [fillcolor=lightgray shape=box style=filled]
+	entity_left [fillcolor=lightgray shape=box style=filled]
+	entity_back [fillcolor=lightgray shape=box style=filled]
+	stay [fillcolor=lightblue style=filled]
+	move_right [fillcolor=lightblue style=filled]
+	move_left [fillcolor=lightblue style=filled]
+	move_forward [fillcolor=lightblue style=filled]
+	806 [fillcolor=white style=filled]
+	entity_front -> move_left [color=green penwidth=0.45532476625358553 style=solid]
+	entity_left -> 806 [color=green penwidth=0.3416194642222164 style=solid]
+}

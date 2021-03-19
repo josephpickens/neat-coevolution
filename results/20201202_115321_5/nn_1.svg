@@ -1,0 +1,18 @@
+digraph {
+	node [fontsize=9 height=0.2 shape=circle width=0.2]
+	entity_right [fillcolor=lightgray shape=box style=filled]
+	entity_front [fillcolor=lightgray shape=box style=filled]
+	entity_left [fillcolor=lightgray shape=box style=filled]
+	entity_back [fillcolor=lightgray shape=box style=filled]
+	move_right [fillcolor=lightblue style=filled]
+	move_left [fillcolor=lightblue style=filled]
+	move_forward [fillcolor=lightblue style=filled]
+	move_backward [fillcolor=lightblue style=filled]
+	entity_back -> move_forward [color=red penwidth=0.2774469809853466 style=solid]
+	entity_left -> move_left [color=green penwidth=0.4005207480088765 style=solid]
+	entity_back -> move_right [color=red penwidth=0.18169104185017898 style=solid]
+	entity_front -> move_forward [color=red penwidth=0.3699963327882816 style=solid]
+	entity_front -> move_left [color=red penwidth=0.35424568099638165 style=solid]
+	entity_back -> move_left [color=red penwidth=0.423116242866707 style=solid]
+	entity_left -> move_forward [color=red penwidth=0.32242770768668183 style=solid]
+}

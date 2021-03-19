@@ -1,0 +1,2 @@
+pursuer evader
+no boundary penalty

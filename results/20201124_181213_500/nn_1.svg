@@ -1,0 +1,13 @@
+digraph {
+	node [fontsize=9 height=0.2 shape=circle width=0.2]
+	top_right [fillcolor=lightgray shape=box style=filled]
+	top_left [fillcolor=lightgray shape=box style=filled]
+	bottom_right [fillcolor=lightgray shape=box style=filled]
+	bottom_left [fillcolor=lightgray shape=box style=filled]
+	stay [fillcolor=lightblue style=filled]
+	right [fillcolor=lightblue style=filled]
+	left [fillcolor=lightblue style=filled]
+	forward [fillcolor=lightblue style=filled]
+	backward [fillcolor=lightblue style=filled]
+	top_right -> forward [color=green penwidth=0.3083156783282455 style=solid]
+}

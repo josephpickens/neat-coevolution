@@ -1,0 +1,2 @@
+Was not resetting environment between 'runs' so lucky runs in which the agent was spawned on top of
+the landmark would run five times, resulting in a payoff of 25, despite the agent doing nothing.

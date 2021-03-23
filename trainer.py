@@ -1,23 +1,20 @@
 #!/usr/bin/python
 import os
-import sys
-sys.path.insert(1, os.path.join(sys.path[0], 'multiagent-particle-envs'))
-import multiprocessing
 import pickle
 import random
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
-import logging
 from itertools import zip_longest, product
 from competitive_scenario import CompetitiveScenario
 from cooperative_scenario import CooperativeScenario
 from ecosystem import Ecosystem
-from parallel import ParallelEvaluator
 import neat
 import visualize
 from multiagent.environment import MultiAgentEnv
 from pareto import ParetoRanker
+import ray
+ray.init()
 
 
 def pair_all_vs_all(pops):
@@ -36,55 +33,42 @@ def pair_random_one_vs_one(pops):
     return zip_longest(*genomes, fillvalue=genomes[0])  # needs better solution than fillvalue
 
 
-# def pair_all_vs_some(pops, n):
-#     random.shuffle(pops)
-#     pairs = []
-#     i = 0
-#     j = n
-#     while j <= len(pops[0]) and len(pops[0]) - j != 1:
-#         pairs.extend(pair_all_vs_all(pops[:, i:j]))
-#         i += n
-#         j += n
-#     pairs.extend(pair_all_vs_all(pops[i:]))
-#     genomes = []
-#     for p in pops:
-#         temp = list(p.population.values())
-#         random.shuffle(temp)
-#         genomes.append(temp)
-#     return genome_pairs
-
-
 def fitness_function(envs, pops):
     for i in range(len(envs)):
-        genome_to_ref = [{} for _ in pops[i]]
-        ref_to_genome = [{} for _ in pops[i]]
+        genome_to_ref = []
+        ref_to_genome = []
         eval_score_dict = []
         configs = []
         for j, p in enumerate(pops[i]):
             genomes = p.population.values()
             eval_score_dict.insert(0, [{} for _ in genomes])
             configs.append(p.config)
-            for ref, g in enumerate(genomes):
-                genome_to_ref[j][g] = str(ref)
-                ref_to_genome[j][str(ref)] = g
+            gtr, rtg = genome_ref_map(genomes)
+            genome_to_ref.append(gtr)
+            ref_to_genome.append(rtg)
         genome_pairs = pair_all_vs_all(pops[i])
-        indices = {}
-        last_indices = [0, 0]
-        for genome_pair in genome_pairs:
-            raw_scores = eval_genome_pair(envs[i], genome_pair, configs)
-            for j, score in enumerate(raw_scores):
-                other_index = (j + 1) % len(genome_pair)
-                if genome_pair[other_index] not in indices.keys():
-                    indices[genome_pair[other_index]] = last_indices[other_index]
-                    last_indices[other_index] += 1
-                index = indices[genome_pair[other_index]]
-                eval_score_dict[j][index][genome_to_ref[j][genome_pair[j]]] = score
-        for j, p in enumerate(pops[i]):
-            ranks = pareto_ranking(ref_to_genome[j].keys(), eval_score_dict)
-            for ref in ranks.keys():
-                ref_to_genome[j][ref].fitness = ranks[ref]
+        # evaluate all genomes in parallel
+        eval_jobs = [eval_genome_pair.remote(envs[i], gp, configs) for gp in genome_pairs]
+        eval_scores = ray.get(eval_jobs)
+        genome_index = {}
+        last_index = [0, 0]
+        for scores, gp in zip(eval_scores, genome_pairs):
+            for j, score in enumerate(scores):
+                k = (j + 1) % len(gp)
+                if gp[k] not in genome_index.keys():
+                    genome_index[gp[k]] = last_index[k]
+                    last_index[k] += 1
+                index = genome_index[gp[k]]
+                eval_score_dict[j][index][genome_to_ref[j][gp[j]]] = score
+        # pareto rank each genome
+        rank_jobs = [pareto_ranking.remote(rtg.keys(), esd) for (rtg, esd) in zip(ref_to_genome, eval_score_dict)]
+        all_ranks = ray.get(rank_jobs)
+        for j, pop_ranks in enumerate(all_ranks):
+            for ref in pop_ranks.keys():
+                ref_to_genome[j][ref].fitness = pop_ranks[ref]
 
 
+@ray.remote
 def eval_genome_pair(env, genome_pair, configs):
     nets = []
     for i, genome in enumerate(genome_pair):
@@ -111,6 +95,16 @@ def eval_genome_pair(env, genome_pair, configs):
     return total_reward_n
 
 
+def genome_ref_map(genomes):
+    genome_to_ref = {}
+    ref_to_genome = {}
+    for ref, g in enumerate(genomes):
+        genome_to_ref[g] = str(ref)
+        ref_to_genome[str(ref)] = g
+    return genome_to_ref, ref_to_genome
+
+
+@ray.remote
 def pareto_ranking(genomes, eval_score_dict):
     ranker = ParetoRanker(genomes, eval_score_dict)
     interlayer_ranks = ranker.rank_population()
@@ -121,59 +115,9 @@ def pareto_ranking(genomes, eval_score_dict):
     return overall_ranks
 
 
-def run(ecosystem_type, num_gen, parallel=True, save_freq=None):
-    ecosystem = build_ecosystem(ecosystem_type)
-    if parallel:
-        pe = ParallelEvaluator(multiprocessing.cpu_count(), eval_genome_pair, pair_all_vs_all, pareto_ranking)
-        ecosystem.run(ecosystem_type, pe.evaluate, n=num_gen, save_function=save_results, save_freq=save_freq)
-    else:
-        ecosystem.run(ecosystem_type, fitness_function, n=num_gen, save_function=save_results, save_freq=save_freq)
-
-
-def build_ecosystem(ecosystem_type):
-    if ecosystem_type == '1_agent':
-        scenarios = [CooperativeScenario(num_agents=1)]
-        populations = create_populations(1)
-        assigned_pops = [populations]
-    elif ecosystem_type == '2_competitive':
-        scenarios = [CompetitiveScenario()]
-        populations = create_populations(2)
-        assigned_pops = [populations]
-    elif ecosystem_type == '2_cooperative':
-        scenarios = [CooperativeScenario()]
-        populations = create_populations(2)
-        assigned_pops = [populations]
-    elif ecosystem_type == '3_mixed':
-        scenarios = [CompetitiveScenario(), CooperativeScenario()]
-        populations = create_populations(3)
-        assigned_pops = [populations[0:2], populations[1:3]]
-    else:
-        raise RuntimeError("Invalid ecosystem type {}".format(ecosystem_type))
-    environments = []
-    for scenario in scenarios:
-        world = scenario.make_world()
-        env = MultiAgentEnv(world, scenario.reset_world, scenario.reward, scenario.observation,
-                            done_callback=scenario.done)
-        environments.append(env)
-    ecosystem = Ecosystem(environments, populations, assigned_pops)
-    return ecosystem
-
-
-def create_populations(num_pops):
-    populations = []
-    for _ in range(num_pops):
-        # Load the config file, which is assumed to live in
-        # the same directory as this script.
-        local_dir = os.path.dirname(__file__)
-        config_path = os.path.join(local_dir, 'config')
-        config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
-                             neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                             config_path)
-        pop = neat.Population(config)
-        pop.add_reporter(neat.StatisticsReporter())
-        pop.add_reporter(neat.StdOutReporter(True))
-        populations.append(pop)
-    return populations
+def run(ecosystem_type, num_gen, save_freq=None):
+    ecosystem = Ecosystem(ecosystem_type)
+    ecosystem.run(fitness_function, n=num_gen, save_function=save_results, save_freq=save_freq)
 
 
 def save_results(ecosystem_type, best_genomes, generation, configs, stats):
@@ -218,7 +162,7 @@ def save_results(ecosystem_type, best_genomes, generation, configs, stats):
 def play_winners(path):
     ecosystem_type = path.split('/')[1].strip()
     # Watch the winners play
-    ecosystem = build_ecosystem(ecosystem_type)
+    ecosystem = Ecosystem(ecosystem_type)
     num_genomes = len(ecosystem.pops)
     winners = []
     local_dir = os.path.dirname(__file__)
@@ -256,7 +200,7 @@ def play_winners(path):
                 env.render()
 
 
-def plot_num_net_connections(paths, num_genomes, gen_step, title):
+def plot_nn_connections(paths, num_genomes, gen_step, title):
     num_connections = [[] for _ in range(num_genomes)]
     for path in paths:
         local_dir = os.path.dirname(__file__)
@@ -303,6 +247,6 @@ def test_pareto():
 if __name__ == '__main__':
     run('2_competitive', 1000, save_freq=50)
     # play_winners('results/3_mixed/20210313_072514_150')
-    # plot_num_net_connections(['results/2_cooperative/%s' % p for p in paths], 2, 50, 'Cooperative Game\n'
+    # plot_nn_connections(['results/2_cooperative/%s' % p for p in paths], 2, 50, 'Cooperative Game\n'
     #                                                                                  'Path: 20210307_103127_1000')
     # test_pareto()

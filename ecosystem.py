@@ -1,19 +1,40 @@
 import os
-import sys
-from random import random
-
-sys.path.insert(1, os.path.join(sys.path[0], 'multiagent-particle-envs'))
-sys.path.insert(2, os.path.join(sys.path[0], 'neat-python'))
 import neat.population
 from neat.statistics import StatisticsReporter
+from cooperative_scenario import CooperativeScenario
+from competitive_scenario import CompetitiveScenario
+from multiagent.environment import MultiAgentEnv
+
 
 class Ecosystem():
-    def __init__(self, environments, populations, assigned_populations):
-        self.envs = environments
-        self.pops = populations
-        self.assigned_pops = assigned_populations
+    def __init__(self, ecosystem_type):
+        self.ecosystem_type = ecosystem_type
+        self.envs = []
+        if ecosystem_type == '1_agent':
+            scenarios = [CooperativeScenario(num_agents=1)]
+            self.pops = create_populations(1)
+            self.assigned_pops = [self.pops]
+        elif ecosystem_type == '2_competitive':
+            scenarios = [CompetitiveScenario()]
+            self.pops = create_populations(2)
+            self.assigned_pops = [self.pops]
+        elif ecosystem_type == '2_cooperative':
+            scenarios = [CooperativeScenario()]
+            self.pops = create_populations(2)
+            self.assigned_pops = [self.pops]
+        elif ecosystem_type == '3_mixed':
+            scenarios = [CompetitiveScenario(), CooperativeScenario()]
+            self.pops = create_populations(3)
+            self.assigned_pops = [self.pops[0:2], self.pops[1:3]]
+        else:
+            raise RuntimeError("Invalid ecosystem type {}".format(ecosystem_type))
+        for scenario in scenarios:
+            world = scenario.make_world()
+            env = MultiAgentEnv(world, scenario.reset_world, scenario.reward, scenario.observation,
+                                done_callback=scenario.done)
+            self.envs.append(env)
 
-    def run(self, ecosystem_type, fitness_function, n=None, save_function=None, save_freq=None):
+    def run(self, fitness_function, n=None, save_function=None, save_freq=None):
         """
         Runs NEAT's genetic algorithm for at most n generations.  If n
         is None, run until solution is found or extinction occurs.
@@ -103,7 +124,7 @@ class Ecosystem():
                     for reporter in pop.reporters.reporters:
                         if isinstance(reporter, StatisticsReporter):
                             stats.append(reporter)
-                save_function(ecosystem_type, best_genomes, k, configs, stats)
+                save_function(self.ecosystem_type, best_genomes, k, configs, stats)
 
         best_genomes = []
         configs = []
@@ -116,4 +137,21 @@ class Ecosystem():
             for reporter in pop.reporters.reporters:
                 if isinstance(reporter, StatisticsReporter):
                     stats.append(reporter)
-        save_function(ecosystem_type, best_genomes, k, configs, stats)
+        save_function(self.ecosystem_type, best_genomes, k, configs, stats)
+
+
+def create_populations(num_pops):
+    populations = []
+    for _ in range(num_pops):
+        # Load the config file, which is assumed to live in
+        # the same directory as this script.
+        local_dir = os.path.dirname(__file__)
+        config_path = os.path.join(local_dir, 'config')
+        config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                             neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                             config_path)
+        pop = neat.Population(config)
+        pop.add_reporter(neat.StatisticsReporter())
+        pop.add_reporter(neat.StdOutReporter(True))
+        populations.append(pop)
+    return populations

@@ -76,6 +76,7 @@ class ParetoRanker():
         layer_sizes = [len(l) for l in layers]
         for s in self.population:
             self.intralayer_rank[s] /= ((layer_sizes[self.rank[s]] - 1) * len(self.objectives) + 1)
+
         return self.intralayer_rank
 
     def count_domination(self, s, t):

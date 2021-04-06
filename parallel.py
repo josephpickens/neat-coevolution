@@ -19,40 +19,66 @@ class ParallelEvaluator(object):
         self.pool.join()
 
     def evaluate(self, envs, pops):
-        eval_jobs = []
         for i in range(len(envs)):
-            genome_to_ref = [{} for _ in pops[i]]
-            ref_to_genome = [{} for _ in pops[i]]
+            genome_to_ref = []
+            ref_to_genome = []
             eval_score_dict = []
             configs = []
             for j, p in enumerate(pops[i]):
                 genomes = p.population.values()
                 eval_score_dict.insert(0, [{} for _ in genomes])
                 configs.append(p.config)
+                gtr = {}
+                rtg = {}
                 for ref, g in enumerate(genomes):
-                    genome_to_ref[j][g] = str(ref)
-                    ref_to_genome[j][str(ref)] = g
+                    gtr[g] = str(ref)
+                    rtg[str(ref)] = g
+                genome_to_ref.append(gtr)
+                ref_to_genome.append(rtg)
             genome_pairs = self.pairing_function(pops[i])
-            for genome_pair in genome_pairs:
-                eval_jobs.append(self.pool.apply_async(self.eval_function,
-                                                       (envs[i], genome_pair, configs)))
+
+            # evaluate genomes in parallel
+            eval_jobs = [self.pool.apply_async(self.eval_function, (envs[i], gp, configs)) for gp in genome_pairs]
             genome_index = {}
             last_index = [0, 0]
-            for job, genome_pair in zip(eval_jobs, genome_pairs):
+            for job, gp in zip(eval_jobs, genome_pairs):
                 eval_scores = job.get(timeout=self.timeout)
                 for j, score in enumerate(eval_scores):
-                    k = (j + 1) % len(eval_scores)
-                    if genome_pair[k] not in genome_index.keys():
-                        genome_index[genome_pair[k]] = last_index[k]
+                    k = (j + 1) % len(gp)
+                    if gp[k] not in genome_index.keys():
+                        genome_index[gp[k]] = last_index[k]
                         last_index[k] += 1
-                    index = genome_index[genome_pair[k]]
-                    eval_score_dict[j][index][genome_to_ref[j][genome_pair[j]]] = score
-            rank_jobs = []
-            for j in range(len(pops[i])):
-                rank_jobs.append(self.pool.apply_async(self.ranking_function,
-                                                       (ref_to_genome[j].keys(),
-                                                        eval_score_dict[j])))
+                    index = genome_index[gp[k]]
+                    eval_score_dict[j][index][genome_to_ref[j][gp[j]]] = score
+
+            # pareto rank each genome
+            rank_jobs = [self.pool.apply_async(self.ranking_function, (rtg.keys(), esd)) for (rtg, esd) in
+                         zip(ref_to_genome, eval_score_dict)]
             for j, job in enumerate(rank_jobs):
                 ranks = job.get(timeout=self.timeout)
                 for ref in ranks.keys():
                     ref_to_genome[j][ref].fitness = ranks[ref]
+
+    def evaluate_simple(self, envs, pops):
+        eval_jobs = []
+        for i in range(len(envs)):
+            configs = []
+            for j, p in enumerate(pops[i]):
+                configs.append(p.config)
+            genome_pairs = self.pairing_function(pops[i])
+            for genome_pair in genome_pairs:
+                eval_jobs.append(self.pool.apply_async(self.eval_function,
+                                                       (envs[i], genome_pair, configs)))
+
+            for job, genome_pair in zip(eval_jobs, genome_pairs):
+                scores = job.get(timeout=self.timeout)
+                if not genome_pair[0].fitness:
+                    genome_pair[0].fitness = 0
+                if not genome_pair[1].fitness:
+                    genome_pair[1].fitness = 0
+                genome_pair[0].fitness += scores[0]
+                genome_pair[1].fitness += scores[1]
+            for j, p in enumerate(pops[i]):
+                genomes = p.population.values()
+                for g in genomes:
+                    g.fitness /= float(len(genomes))

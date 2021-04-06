@@ -1,62 +1,14 @@
-import os
 import neat.population
 from neat.statistics import StatisticsReporter
-from cooperative_scenario import CooperativeScenario
-from competitive_scenario import CompetitiveScenario
-from multiagent.environment import MultiAgentEnv
 
 
 class Ecosystem():
-    def __init__(self, ecosystem_type):
-        self.ecosystem_type = ecosystem_type
-        self.envs = []
-        if ecosystem_type == '1_agent':
-            scenarios = [CooperativeScenario(num_agents=1)]
-            self.pops = create_populations(1)
-            self.assigned_pops = [self.pops]
-        elif ecosystem_type == '2_competitive':
-            scenarios = [CompetitiveScenario()]
-            self.pops = create_populations(2)
-            self.assigned_pops = [self.pops]
-        elif ecosystem_type == '2_cooperative':
-            scenarios = [CooperativeScenario()]
-            self.pops = create_populations(2)
-            self.assigned_pops = [self.pops]
-        elif ecosystem_type == '3_mixed':
-            scenarios = [CompetitiveScenario(), CooperativeScenario()]
-            self.pops = create_populations(3)
-            self.assigned_pops = [self.pops[0:2], self.pops[1:3]]
-        else:
-            raise RuntimeError("Invalid ecosystem type {}".format(ecosystem_type))
-        for scenario in scenarios:
-            world = scenario.make_world()
-            env = MultiAgentEnv(world, scenario.reset_world, scenario.reward, scenario.observation,
-                                done_callback=scenario.done)
-            self.envs.append(env)
+    def __init__(self, environments, populations, assigned_populations):
+        self.envs = environments
+        self.pops = populations
+        self.assigned_pops = assigned_populations
 
-    def run(self, fitness_function, n=None, save_function=None, save_freq=None):
-        """
-        Runs NEAT's genetic algorithm for at most n generations.  If n
-        is None, run until solution is found or extinction occurs.
-
-        The user-provided fitness_function must take only two arguments:
-            1. The population as a list of (genome id, genome) tuples.
-            2. The current configuration object.
-
-        The return value of the fitness function is ignored, but it must assign
-        a Python float to the `fitness` member of each genome.
-
-        The fitness function is free to maintain external state, perform
-        evaluations in parallel, etc.
-
-        It is assumed that fitness_function does not modify the list of genomes,
-        the genomes themselves (apart from updating the fitness member),
-        or the configuration object.
-        """
-
-        # if self.config_1_agents.no_fitness_termination and (n is None):
-        #     raise RuntimeError("Cannot have no generational limit with no fitness termination")
-
+    def run(self, fitness_function, n=None, save_function=None, save_freq=None, save_path=None):
         k = 0
         while n is None or k < n:
             k += 1
@@ -70,7 +22,6 @@ class Ecosystem():
             # Gather and report statistics.
             best = [None] * len(self.pops)
             for i, pop in enumerate(self.pops):
-
                 for g in pop.population.values():
                     if g.fitness is None:
                         raise RuntimeError("Fitness not assigned to genome {}".format(g.key))
@@ -114,6 +65,7 @@ class Ecosystem():
 
                 pop.generation += 1
 
+            # save best genomes
             if save_freq is not None and k % save_freq == 0 and k != n:
                 best_genomes = []
                 configs = []
@@ -124,7 +76,7 @@ class Ecosystem():
                     for reporter in pop.reporters.reporters:
                         if isinstance(reporter, StatisticsReporter):
                             stats.append(reporter)
-                save_function(self.ecosystem_type, best_genomes, k, configs, stats)
+                save_function(save_path, best_genomes, k, configs, stats)
 
         best_genomes = []
         configs = []
@@ -137,21 +89,5 @@ class Ecosystem():
             for reporter in pop.reporters.reporters:
                 if isinstance(reporter, StatisticsReporter):
                     stats.append(reporter)
-        save_function(self.ecosystem_type, best_genomes, k, configs, stats)
+        save_function(save_path, best_genomes, k, configs, stats)
 
-
-def create_populations(num_pops):
-    populations = []
-    for _ in range(num_pops):
-        # Load the config file, which is assumed to live in
-        # the same directory as this script.
-        local_dir = os.path.dirname(__file__)
-        config_path = os.path.join(local_dir, 'config')
-        config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
-                             neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                             config_path)
-        pop = neat.Population(config)
-        pop.add_reporter(neat.StatisticsReporter())
-        pop.add_reporter(neat.StdOutReporter(True))
-        populations.append(pop)
-    return populations

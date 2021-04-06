@@ -1,7 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8f5e8759-c861-4939-9325-67afe9b1be54" name="Default Changelist" comment="" />
+    <list default="true" id="8f5e8759-c861-4939-9325-67afe9b1be54" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/animate.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/eval_scenario.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fitness_function.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/save_results.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simple_spread.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/competitive_scenario.py" beforeDir="false" afterPath="$PROJECT_DIR$/competitive_scenario.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config" beforeDir="false" afterPath="$PROJECT_DIR$/config" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cooperative_scenario.py" beforeDir="false" afterPath="$PROJECT_DIR$/cooperative_scenario.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecosystem.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecosystem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/multiagent-particle-envs" beforeDir="false" afterPath="$PROJECT_DIR$/multiagent-particle-envs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/multiagent-particle-envs/multiagent/multi_discrete.py" beforeDir="false" afterPath="$PROJECT_DIR$/multiagent-particle-envs/multiagent/multi_discrete.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/multiagent-particle-envs/multiagent/rendering.py" beforeDir="false" afterPath="$PROJECT_DIR$/multiagent-particle-envs/multiagent/rendering.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/docs/conf.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/docs/conf.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/examples/circuits/evolve.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/examples/circuits/evolve.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/examples/memory-fixed/evolve.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/examples/memory-fixed/evolve.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/examples/openai-lander/evolve.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/examples/openai-lander/evolve.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/examples/single-pole-balancing/evolve-ctrnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/examples/single-pole-balancing/evolve-ctrnn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/examples/single-pole-balancing/evolve-feedforward.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/examples/single-pole-balancing/evolve-feedforward.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/examples/single-pole-balancing/test-ctrnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/examples/single-pole-balancing/test-ctrnn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/examples/single-pole-balancing/test-feedforward.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/examples/single-pole-balancing/test-feedforward.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/examples/xor/evolve-feedforward-threaded.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/examples/xor/evolve-feedforward-threaded.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/examples/xor/evolve-feedforward.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/examples/xor/evolve-feedforward.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/examples/xor/evolve-minimal.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/examples/xor/evolve-minimal.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/examples/xor/evolve-spiking.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/examples/xor/evolve-spiking.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/neat/reporting.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/neat/reporting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/tests/test_config.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/tests/test_config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/tests/test_config_save_restore.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/tests/test_config_save_restore.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/tests/test_ctrnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/tests/test_ctrnn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/tests/test_feedforward_network.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/tests/test_feedforward_network.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/tests/test_iznn.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/tests/test_iznn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/tests/test_nn.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/tests/test_nn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/tests/test_population.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/tests/test_population.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neat-python/tests/test_simple_run.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/tests/test_simple_run.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parallel.py" beforeDir="false" afterPath="$PROJECT_DIR$/parallel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pareto.py" beforeDir="false" afterPath="$PROJECT_DIR$/pareto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/1_agent/20210212_043135_10000/.speciation.svg.icloud" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/1_agent/20210212_222438_10000/.speciation.svg.icloud" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/visualize.py" beforeDir="false" afterPath="$PROJECT_DIR$/visualize.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -15,7 +59,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../neat-coevolution/neat-python" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1pGBk3Ix7nn3YRzeqa8rgVZNx2k" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -27,7 +71,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PythonContentEntriesConfigurable" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
@@ -51,7 +95,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="trainer" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="trainer" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="neat-coevolution" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -163,5 +207,17 @@
       <updated>1614799685741</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
 </project>

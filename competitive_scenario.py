@@ -1,40 +1,35 @@
 #!/usr/bin/env python
 
 import numpy as np
-from math import pi, atan2
+
 from multiagent.core import World, Agent, Landmark
-from multiagent.scenario import BaseScenario
+from eval_scenario import EvalScenario
 
 
-class CompetitiveScenario(BaseScenario):
-    def __init__(self, num_pursuers=1, num_evaders=1, num_landmarks=1):
-        self.num_pursuers = num_pursuers
-        self.num_evaders = num_evaders
-        self.num_landmarks = num_landmarks
+class CompetitiveScenario(EvalScenario):
+    def __init__(self):
+        super().__init__()
+        self.num_pursuers = 1
+        self.num_landmarks = 1
 
     def make_world(self):
         world = World()
         # set any world properties first
         world.dim_c = 2
-        world.discrete_action = False
-        num_agents = self.num_pursuers + self.num_evaders
         # add agents
-        world.agents = [Agent() for i in range(num_agents)]
+        world.agents = [Agent() for _ in range(self.num_agents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
-            agent.collide = True
             agent.pursuer = True if i < self.num_pursuers else False
-            agent.size = 0.05
-            agent.accel = 3.0
-            agent.max_speed = 1
+            agent.collide = True
+            agent.silent = True
+            agent.size = 0.15
         # add landmarks
-        world.landmarks = [Landmark() for i in range(self.num_landmarks)]
+        world.landmarks = [Landmark() for _ in range(self.num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
             landmark.name = 'landmark %d' % i
             landmark.collide = False
             landmark.movable = False
-            landmark.size = 0.05
-            landmark.boundary = False
         # make initial conditions
         self.reset_world(world)
         return world
@@ -57,15 +52,8 @@ class CompetitiveScenario(BaseScenario):
             agent.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
             agent.state.p_vel = np.zeros(world.dim_p)
         for i, landmark in enumerate(world.landmarks):
-            if not landmark.boundary:
-                landmark.state.p_pos = np.random.uniform(-0.9, +0.9, world.dim_p)
-                landmark.state.p_vel = np.zeros(world.dim_p)
-
-    def is_collision(self, entity1, entity2):
-        delta_pos = entity1.state.p_pos - entity2.state.p_pos
-        dist = np.sqrt(np.sum(np.square(delta_pos)))
-        dist_min = entity1.size + entity2.size
-        return True if dist < dist_min else False
+            landmark.state.p_pos = np.random.uniform(-0.9, +0.9, world.dim_p)
+            landmark.state.p_vel = np.zeros(world.dim_p)
 
     # return all evaders
     def evaders(self, world):
@@ -77,77 +65,33 @@ class CompetitiveScenario(BaseScenario):
 
     def reward(self, agent, world):
         # Agents are rewarded based on whether they are pursuer or evader
-        main_reward = self.pursuer_reward(agent, world) if agent.pursuer else self.evader_reward(agent, world)
-        return main_reward
+        return self.pursuer_reward(agent, world) if agent.pursuer else self.evader_reward(agent, world)
 
     def evader_reward(self, agent, world):
         # evaders are rewarded for reaching landmark before being caught
         rew = 0
         shape = True
-        if shape:  # reward can optionally be shaped (decreased reward for increased distance from landmark)
-            rew -= 0.1 * min(np.sqrt(np.sum(np.square(agent.state.p_pos - lm.state.p_pos)))
-                             for lm in world.landmarks)
-        if any([self.is_collision(agent, lm) for lm in world.landmarks]):
-            rew += 1
-        if any([self.is_collision(agent, p) and not self.is_collision(agent, lm)
-                for p in self.pursuers(world) for lm in world.landmarks]):
-            rew -= 1
-        # # boundary penalty
-        # for p in range(world.dim_p):
-        #     x = abs(agent.state.p_pos[p])
-        #     rew -= self.boundary_penalty(x)
+        for lm in world.landmarks:
+            dist = self.get_distance(agent, lm)
+            if self.is_collision(agent, lm, distance=dist):
+                rew += 10
+            else:
+                rew -= dist
+                if any([self.is_collision(agent, p) for p in self.pursuers(world)]):
+                    rew -= 10
         return rew
 
     def pursuer_reward(self, agent, world):
         # pursuers are rewarded for collisions with evaders
         rew = 0
-        shape = True
         evaders = self.evaders(world)
-        if shape:  # reward can optionally be shaped (decreased reward for increased distance from evaders)
-            rew -= 0.1 * min([np.sqrt(np.sum(np.square(agent.state.p_pos - e.state.p_pos)))
-                              for e in evaders])
-        if any([self.is_collision(agent, e) and not self.is_collision(e, lm)
-                for e in evaders for lm in world.landmarks]):
-            rew += 1
-        # # boundary penalty
-        # for p in range(world.dim_p):
-        #     x = abs(agent.state.p_pos[p])
-        #     rew -= self.boundary_penalty(x)
+        if any([self.is_collision(agent, lm) for lm in world.landmarks]):
+            rew -= 10
+        else:
+            for e in evaders:
+                dist = np.sqrt(np.sum(np.square(agent.state.p_pos - e.state.p_pos)))
+                if dist < agent.size + e.size:
+                    rew += 10
+                else:
+                    rew -= dist
         return rew
-
-    # agent penalty for exiting the screen
-    def boundary_penalty(self, x):
-        if x < 0.9:
-            return 0
-        return 10
-
-    def observation(self, agent, world):
-        entity_headings = [0] * 16
-        for entity in world.entities:
-            if entity is agent:
-                continue
-            if isinstance(entity, Agent):
-                i = 0
-            else:
-                i = 1
-            pos = entity.state.p_pos - agent.state.p_pos
-            direction = atan2(pos[1], pos[0])
-            if direction < 0:
-                direction += 2 * pi
-            entity_found = False
-            j = 1
-            while j < 8 and not entity_found:
-                if (2 * j - 1) * pi / 8 <= direction < (2 * j + 1) * pi / 8:
-                    entity_headings[2 * j + i] = 1
-                    entity_found = True
-                j += 1
-            if not entity_found:
-                entity_headings[i] = 1
-        return entity_headings
-
-    def done(self, agent, world):
-        if agent.pursuer and any([self.is_collision(agent, e) for e in self.evaders(world)]):
-            return True
-        elif any([self.is_collision(agent, lm) for lm in world.landmarks]):
-            return True
-        return False

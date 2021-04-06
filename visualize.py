@@ -1,12 +1,35 @@
 from __future__ import print_function
 
 import copy
+import os
+import pickle
 import warnings
 
 import graphviz
 import matplotlib.pyplot as plt
+import neat
 import numpy as np
 
+def plot_num_net_connections(paths, num_genomes, gen_step, title):
+    num_connections = [[] for _ in range(num_genomes)]
+    for path in paths:
+        local_dir = os.path.dirname(__file__)
+        config_path = os.path.join(local_dir, path + '/config')
+        config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                             neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                             config_path)
+        for i in range(num_genomes):
+            genome = pickle.load(open(path + '/genome_%d' % (i + 1), 'rb'))
+            num_connections[i].append(len([c for c in genome.connections.values() if c.enabled]))
+    gen_nums = range(gen_step, gen_step * (len(num_connections[0]) + 1), gen_step)
+    for i in range(num_genomes):
+        plt.plot(gen_nums, num_connections[i], label=('Best genome from population %d' % (i + 1)))
+    plt.xlabel('Generation')
+    plt.ylabel('Number of Neural Net Connections')
+    plt.title(title)
+    plt.legend()
+    plt.savefig(paths[-1] + '.svg')
+    plt.show()
 
 def plot_stats(statistics, ylog=False, view=False, filename='avg_fitness.svg'):
     """ Plots the population's average and best fitness. """

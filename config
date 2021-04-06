@@ -6,18 +6,18 @@
 fitness_criterion     = max
 fitness_threshold     = 100
 no_fitness_termination = True
-pop_size              = 50
+pop_size              = 100
 reset_on_extinction   = 1
 
 [DefaultGenome]
-num_inputs              = 16
+num_inputs              = 12
 num_hidden              = 0
-num_outputs             = 4
+num_outputs             = 5
 initial_connection      = partial_direct 0.5
-feed_forward            = False
+feed_forward            = True
 compatibility_disjoint_coefficient    = 1.0
 compatibility_weight_coefficient      = 0.6
-single_structural_mutation            = True
+single_structural_mutation            = False
 structural_mutation_surer             = True
 conn_add_prob           = 0.3
 conn_delete_prob        = 0.1
@@ -60,7 +60,7 @@ compatibility_threshold = 3.0
 [DefaultStagnation]
 species_fitness_func = max
 max_stagnation  = 20
-species_elitism = 2
+species_elitism = 1
 
 [DefaultReproduction]
 elitism            = 2

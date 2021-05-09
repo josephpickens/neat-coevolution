@@ -1,0 +1,1 @@
+Trading food game. Hunger increases each time step by 2 regardless. Agent can gather 1 units of their own food and 5 units of the other's food. Amount of one's own food lowers hunger by at most 5 units each time step.

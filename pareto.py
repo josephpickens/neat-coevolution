@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 '''
-Pareto ranking algorithm derived from "Best Order Sort: A New Algorithm to Non-dominated Sorting for
+Pareto ranking algorithm implemented from "Best Order Sort: A New Algorithm to Non-dominated Sorting for
 Evolutionary Multi-objective Optimization" by Roy, Islam, and Deb.
 
 URL: https://www.egr.msu.edu/~kdeb/papers/c2016009.pdf

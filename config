@@ -6,15 +6,15 @@
 fitness_criterion     = max
 fitness_threshold     = 100
 no_fitness_termination = True
-pop_size              = 100
+pop_size              = 4
 reset_on_extinction   = 1
 
 [DefaultGenome]
 num_inputs              = 12
 num_hidden              = 0
-num_outputs             = 5
+num_outputs             = 8
 initial_connection      = partial_direct 0.5
-feed_forward            = True
+feed_forward            = False
 compatibility_disjoint_coefficient    = 1.0
 compatibility_weight_coefficient      = 0.6
 single_structural_mutation            = False

@@ -1,0 +1,1 @@
+Food trading game. Cannot extract own food directly from source. world.collaborative = True.

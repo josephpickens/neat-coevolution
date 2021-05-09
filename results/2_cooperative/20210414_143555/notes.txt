@@ -1,0 +1,1 @@
+Food trading game. No gathering directly from one's own food source. Can only gather other agent's food source and then trade. world.collaborative = False

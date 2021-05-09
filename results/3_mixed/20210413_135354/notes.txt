@@ -1,0 +1,1 @@
+In this run the pursuer in the competitive game also plays in the cooperative game, while the evader only plays the competitive game.

@@ -1,12 +1,15 @@
 import neat.population
 from neat.statistics import StatisticsReporter
 
+from world import DirectionalWorld
+
 
 class Ecosystem():
     def __init__(self, environments, populations, assigned_populations):
         self.envs = environments
         self.pops = populations
         self.assigned_pops = assigned_populations
+        self.directional = isinstance(self.envs[0].world, DirectionalWorld)
 
     def run(self, fitness_function, n=None, save_function=None, save_freq=None, save_path=None):
         k = 0
@@ -17,7 +20,7 @@ class Ecosystem():
                 pop.reporters.start_generation(pop.generation)
 
             # Evaluate all genomes using the user-provided function.
-            fitness_function(self.envs, self.assigned_pops)
+            fitness_function(self.envs, self.pops, self.assigned_pops)
 
             # Gather and report statistics.
             best = [None] * len(self.pops)
@@ -76,7 +79,7 @@ class Ecosystem():
                     for reporter in pop.reporters.reporters:
                         if isinstance(reporter, StatisticsReporter):
                             stats.append(reporter)
-                save_function(save_path, best_genomes, k, configs, stats)
+                save_function(save_path, best_genomes, k, configs, stats, self.directional)
 
         best_genomes = []
         configs = []
@@ -89,5 +92,5 @@ class Ecosystem():
             for reporter in pop.reporters.reporters:
                 if isinstance(reporter, StatisticsReporter):
                     stats.append(reporter)
-        save_function(save_path, best_genomes, k, configs, stats)
+        save_function(save_path, best_genomes, k, configs, stats, self.directional)
 

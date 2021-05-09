@@ -1,0 +1,3 @@
+Trading food game. Fixed agent_index in reward. world.collaborative = False now, so agents do not receive identical payoffs.
+
+EDIT: discovered payoff incentives not good. Need to have hunger outpace rate of gathering one's own food directly.

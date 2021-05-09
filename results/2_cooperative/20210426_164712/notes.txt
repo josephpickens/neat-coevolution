@@ -1,0 +1,1 @@
+Hunger change observation, walls, no stacked frames. Added back right/left actions.

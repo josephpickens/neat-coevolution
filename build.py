@@ -2,25 +2,47 @@ import os
 
 import neat
 from multiagent.environment import MultiAgentEnv
+from directional_agent_env import DirectionalMultiAgentEnv
 from competitive_scenario import CompetitiveScenario
 from cooperative_scenario import CooperativeScenario
 from ecosystem import Ecosystem
 from simple_spread import SimpleSpreadScenario
 
 
-def build_ecosystem(ecosystem_type):
+def build_ecosystem(ecosystem_type, directional):
     if ecosystem_type == '2_competitive':
-        scenarios = [CompetitiveScenario()]
+        scenarios = [CompetitiveScenario(agent_colors=['red', 'yellow'],
+                                         directional=directional)]
         populations = create_populations(2)
         assigned_pops = [populations]
     elif ecosystem_type == '2_cooperative':
-        scenarios = [CooperativeScenario()]
+        scenarios = [CooperativeScenario(agent_colors=['green', 'blue'],
+                                         directional=directional)]
         populations = create_populations(2)
         assigned_pops = [populations]
     elif ecosystem_type == '3_mixed':
-        scenarios = [CompetitiveScenario(), CooperativeScenario()]
+        scenarios = [CompetitiveScenario(agent_colors=['red', 'yellow'],
+                                         directional=directional),
+                     CooperativeScenario(agent_colors=['yellow', 'blue'],
+                                         directional=directional)]
         populations = create_populations(3)
         assigned_pops = [populations[0:2], populations[1:3]]
+    elif ecosystem_type == '3_competitive':
+        scenarios = [CompetitiveScenario(agent_colors=['red', 'orange'],
+                                         directional=directional),
+                     CompetitiveScenario(agent_colors=['orange', 'yellow'],
+                                         directional=directional)]
+        populations = create_populations(3)
+        assigned_pops = [populations[0:2], populations[1:3]]
+    elif ecosystem_type == '4_mixed':
+        scenarios = [CooperativeScenario(agent_colors=['green', 'yellow'],
+                                         directional=directional),
+                     CompetitiveScenario(agent_colors=['yellow', 'orange'],
+                                         directional=directional),
+                     CooperativeScenario(agent_colors=['orange', 'blue'],
+                                         directional=directional)]
+        populations = create_populations(4)
+        assigned_pops = [populations[0:2], populations[1:3], populations[2:4]]
     elif ecosystem_type == '2_spread':
         scenarios = [SimpleSpreadScenario(num_agents=2)]
         populations = create_populations(2)
@@ -31,8 +53,12 @@ def build_ecosystem(ecosystem_type):
     environments = []
     for scenario in scenarios:
         world = scenario.make_world()
-        env = MultiAgentEnv(world, scenario.reset_world, scenario.reward, scenario.observation,
-                            done_callback=scenario.done)
+        if directional:
+            env = DirectionalMultiAgentEnv(world, scenario.reset_world, scenario.reward,
+                                           scenario.observation_organism, done_callback=scenario.done)
+        else:
+            env = MultiAgentEnv(world, scenario.reset_world, scenario.reward,
+                                scenario.observation, done_callback=scenario.done)
         environments.append(env)
     ecosystem = Ecosystem(environments, populations, assigned_pops)
     return ecosystem

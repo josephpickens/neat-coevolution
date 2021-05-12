@@ -29,13 +29,14 @@ def save_results(path, best_genomes, generation, configs, stats, directional):
         input_node_keys = range(-1, -num_keys - 1, -1)
         for i, j in enumerate(input_node_keys):
             node_names[j] = wedge_ids[i // len(entities)] + '_' + entities[i % len(entities)]
+
         if stack_obs:
-            obs_memory = 4
+            obs_memory = 3
             input_node_keys = list(input_node_keys) + list(range(-num_keys, -num_keys * obs_memory - 1, -1))
             for i, j in enumerate(input_node_keys[num_keys + 1:]):
                 node_names[j] = (wedge_ids[(i // len(entities)) % num_wedges] + '_' + entities[i % len(entities)]
                                  + '_t-%d' % (i // num_keys + 1))
-        # node_names[-num_keys - 1] = 'hunger_change'
+
         if stack_actions:
             action_memory = 2
             actions = ['right', 'forward', 'turn']
@@ -61,6 +62,13 @@ def save_results(path, best_genomes, generation, configs, stats, directional):
                       -11: 'x-other-vel',
                       -12: 'y-other-vel'
                       }
+
+        if stack_actions:
+            action_memory = 2
+            actions = ['right', 'forward']
+            keys = range(-13, -13 - len(actions) * action_memory, -1)
+            for i, j in enumerate(keys):
+                node_names[j] = actions[(i % len(actions))] + '_t-%d' % (i // len(actions) + 1)
 
     # Save results
     for i, genome in enumerate(best_genomes):

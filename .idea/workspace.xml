@@ -2,36 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8f5e8759-c861-4939-9325-67afe9b1be54" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/directional_agent_env.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_competitive/20210413_155755/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210414_110044/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210414_123742/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210414_131651/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210414_143555/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210414_153326/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210420_103124/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210420_122943/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210420_130354/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210420_154514/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210420_164925/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210420_171025/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210424_112204/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210426_092748/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210426_133846/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210426_164712/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/2_cooperative/20210427_081631/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/3_mixed/20210413_135354/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/results/3_mixed/20210413_190606/notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/world.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/results/2_competitive/20210512_122056/notes.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/animate.py" beforeDir="false" afterPath="$PROJECT_DIR$/animate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.py" beforeDir="false" afterPath="$PROJECT_DIR$/build.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/competitive_scenario.py" beforeDir="false" afterPath="$PROJECT_DIR$/competitive_scenario.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config" beforeDir="false" afterPath="$PROJECT_DIR$/config" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cooperative_scenario.py" beforeDir="false" afterPath="$PROJECT_DIR$/cooperative_scenario.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ecosystem.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecosystem.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/eval_scenario.py" beforeDir="false" afterPath="$PROJECT_DIR$/eval_scenario.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fitness_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/fitness_function.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/homebrew-deps" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/multiagent-particle-envs" beforeDir="false" afterPath="$PROJECT_DIR$/multiagent-particle-envs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/multiagent-particle-envs/multiagent/multi_discrete.py" beforeDir="false" afterPath="$PROJECT_DIR$/multiagent-particle-envs/multiagent/multi_discrete.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/multiagent-particle-envs/multiagent/rendering.py" beforeDir="false" afterPath="$PROJECT_DIR$/multiagent-particle-envs/multiagent/rendering.py" afterDir="false" />
@@ -57,10 +36,7 @@
       <change beforePath="$PROJECT_DIR$/neat-python/tests/test_nn.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/tests/test_nn.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/neat-python/tests/test_population.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/tests/test_population.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/neat-python/tests/test_simple_run.py" beforeDir="false" afterPath="$PROJECT_DIR$/neat-python/tests/test_simple_run.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parallel.py" beforeDir="false" afterPath="$PROJECT_DIR$/parallel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pareto.py" beforeDir="false" afterPath="$PROJECT_DIR$/pareto.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/save_results.py" beforeDir="false" afterPath="$PROJECT_DIR$/save_results.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/trainer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

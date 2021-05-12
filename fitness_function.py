@@ -7,6 +7,7 @@ import operator
 import neat
 
 from pareto import ParetoRanker
+from world import DirectionalWorld
 
 
 def pair_all_vs_all(pops):
@@ -43,6 +44,7 @@ def pair_random_one_vs_one(pops):
 
 
 def eval_genome_pair(env, genome_pair, configs):
+    directional = isinstance(env.world, DirectionalWorld)
     nets = []
     for i, genome in enumerate(genome_pair):
         nets.append(neat.nn.RecurrentNetwork.create(genome, configs[i]))
@@ -60,11 +62,12 @@ def eval_genome_pair(env, genome_pair, configs):
             act_n = []
             for i, net in enumerate(nets):
                 activation = net.activate(obs_n[i])
-                move_idx = np.argmax(activation[0:5])
-                turn_idx = np.argmax(activation[5:]) + 5
                 u = np.zeros(len(activation))
+                move_idx = np.argmax(activation[0:5])
                 u[move_idx] = 1.0
-                u[turn_idx] = 1.0
+                if directional:
+                    turn_idx = np.argmax(activation[5:]) + 5
+                    u[turn_idx] = 1.0
                 act_n.append(np.concatenate([u, np.zeros(env.world.dim_c)]))
             # step environment
             obs_n, reward_n, _, _ = env.step(act_n)

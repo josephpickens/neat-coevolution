@@ -15,6 +15,7 @@ class CooperativeScenario(EvalScenario):
         world.collaborative = True
         for agent in world.agents:
             agent.hunger = 0
+            # agent.food = [0] * len(world.agents)
         self.reset_world(world)
         return world
 
@@ -60,11 +61,12 @@ class CooperativeScenario(EvalScenario):
     #     rew -= min(other_dists)
     #     agent_index = int(agent.name.split()[1])
     #     other_index = (agent_index + 1) % len(world.agents)
+    #
     #     # gather food
     #     for i, lm in enumerate(world.landmarks):
     #         if self.is_collision(agent, lm):
-    #             if i == other_index:
-    #                 agent.food[other_index] += 5
+    #             if i != agent_index:
+    #                 agent.food[i] += 5
     #
     #     # exchange food
     #     for a in world.agents:
@@ -85,4 +87,5 @@ class CooperativeScenario(EvalScenario):
     #         agent.hunger = max(agent.hunger - amount, 0)
     #         agent.food[agent_index] -= amount
     #     rew -= agent.hunger
+    #
     #     return rew

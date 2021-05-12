@@ -45,7 +45,11 @@ class EvalScenario(BaseScenario):
             if world.stack_obs:
                 agent.past_obs = [[0] * 24 for _ in range(3)]
             if world.stack_actions:
-                agent.prev_actions = [[0, 0, 0] for _ in range(2)]
+                if self.directional:
+                    n_actions = 3
+                else:
+                    n_actions = 2
+                agent.prev_actions = [[0] * n_actions for _ in range(2)]
         # add landmarks
         world.landmarks = [Landmark() for i in range(self.num_landmarks)]
         landmark_colors = ['black', 'black']
@@ -236,7 +240,12 @@ class EvalScenario(BaseScenario):
             other_pos.append(other.state.p_pos - agent.state.p_pos)
             other_pos.append(other.state.p_vel)
         obs = np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos)  # + comm)
-
+        if world.stack_actions:
+            if agent.action.u is not None:
+                agent.prev_actions[1:] = agent.prev_actions[:-1]
+                agent.prev_actions[0] = agent.action.u
+            for a in agent.prev_actions:
+                obs = np.concatenate([obs, np.array(a)])
         # x-vel, y-vel, x-pos, y-pos, x-lm0-vec, y-lm1-vec, x-lm2-vec, y-lm2-vec,
         # x-other-vec, y-other-vec, x-other-vel, y-other-vel
         return obs

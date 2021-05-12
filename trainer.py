@@ -33,5 +33,5 @@ def run(ecosystem_type, num_gen, parallel=True, save_freq=None, directional=True
 
 
 if __name__ == '__main__':
-    run('2_cooperative', 10000, save_freq=2, parallel=True, directional=False)
+    run('2_competitive', 10000, save_freq=5, parallel=True, directional=True)
 
